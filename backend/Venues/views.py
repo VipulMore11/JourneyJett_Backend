@@ -130,14 +130,24 @@ def personalize_recommendations(request):
 @permission_classes([IsAuthenticated])
 def saved_places(request):
     try:
-        serializer = SavedPlaceSerializer(data=request.data)
+        user = request.user
+        place_id = request.data.get('id')  # Retrieve place_id from request data
+        serializer = SavedPlaceSerializer(data={'user': user.id, 'place': place_id})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)    
-            
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except SavedPlaces.DoesNotExist:
-        return Response( {'Error':'Saved Places does not exist'} , status=status.HTTP_404_NOT_FOUND )  
     except Exception as e:
-        return Response( { 'Error':str(e)} , status=status.HTTP_400_BAD_REQUEST)
+        return Response({'Error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_saved_places(request):
+    try:
+        user = request.user.id
+        saved = SavedPlaces.objects.get(user=user)
+        serializers = SavedPlaceSerializer(saved, many=True)
+        return Response(serializers.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'Error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

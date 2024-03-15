@@ -64,10 +64,15 @@ class FestivalSerializer(serializers.ModelSerializer):
         model = Festivals
         fields = '__all__'
 
+class ListField(serializers.Field):
+    def to_representation(self, obj):
+        return obj.split(',') if obj else []
+
 class PlaceSerializer(serializers.ModelSerializer):
     images = PlacesImageSerializer(many=True, read_only = True)
     festivals = FestivalSerializer(many=True, read_only = True)
     reviews = ReviewSerializer(many=True, read_only = True)
+    location = ListField()
 
     class Meta:
         model = Places
@@ -91,4 +96,4 @@ class DestinationSerializer(serializers.ModelSerializer):
 class SavedPlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = SavedPlaces
-        fields = '__all__'
+        fields = ['user', 'place']

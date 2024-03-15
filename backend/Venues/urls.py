@@ -11,5 +11,6 @@ urlpatterns = [
     path('get_destinations/',views.get_destination_view,name='get_destinations'),
     path('recommendations/', views.personalize_recommendations,name='recommendations'),
     path('saved_places/', views.saved_places,name='saved_places'),
+    path('get_saved_places/', views.get_saved_places, name='get_saved_places'),
     # path('code/', views.execute_code,name='code'),
 ]

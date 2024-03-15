@@ -64,15 +64,11 @@ class FestivalSerializer(serializers.ModelSerializer):
         model = Festivals
         fields = '__all__'
 
-class ListField(serializers.Field):
-    def to_representation(self, obj):
-        return obj.split(',') if obj else []
 
 class PlaceSerializer(serializers.ModelSerializer):
     images = PlacesImageSerializer(many=True, read_only = True)
     festivals = FestivalSerializer(many=True, read_only = True)
     reviews = ReviewSerializer(many=True, read_only = True)
-    location = ListField()
 
     class Meta:
         model = Places
@@ -85,6 +81,19 @@ class PlaceSerializer(serializers.ModelSerializer):
         # Assign custom IDs starting from 1 for each event's cast images
         for index, cast_image in enumerate(cast_images, start=1):
             cast_image['id'] = index
+
+        location_str = representation.get('location', '')
+        if location_str:
+            # Clean up the string value
+            location_str = location_str.replace('[', '').replace(']', '').replace('"', '')  # Remove brackets and quotation marks
+            # Split the cleaned location string by comma and convert each coordinate to float
+            location_list = [float(coord.strip()) for coord in location_str.split(',') if coord.strip()]
+        else:
+            # If location is None, set it as an empty list
+            location_list = []
+
+        # Update the representation with the location list
+        representation['location'] = location_list
 
         return representation
     

@@ -146,7 +146,7 @@ def saved_places(request):
 def get_saved_places(request):
     try:
         user = request.user.id
-        saved = SavedPlaces.objects.get(user=user)
+        saved = SavedPlaces.objects.filter(user=user)
         serializers = SavedPlaceSerializer(saved, many=True)
         return Response(serializers.data, status=status.HTTP_200_OK)
     except Exception as e:

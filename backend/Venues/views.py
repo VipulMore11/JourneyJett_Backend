@@ -76,7 +76,7 @@ def get_destination_view(request):
         state = request.GET.get('state')
         try:
             if state:
-                    destinations = Places.objects.filter(Q(city__icontains=state) | Q(state__icontains=state))
+                    destinations = Places.objects.filter(Q(city__icontains=state) | Q(state__icontains=state) | Q(name__icontains=state) | Q(info__icontains=state))
                     serializer = DestinationSerializer(destinations, many=True)
                     return Response(serializer.data, status=status.HTTP_200_OK)
             else:

@@ -73,6 +73,7 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(password)  # Set the password using set_password method
         user.is_active= True
         user.save()
+        Profile.objects.create(user=user,email=email, username=username, phone_number=phone_no)
         return user
 
 from rest_framework import serializers

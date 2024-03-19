@@ -98,6 +98,9 @@ class PlaceSerializer(serializers.ModelSerializer):
         return representation
     
 class DestinationSerializer(serializers.ModelSerializer):
+    images = PlacesImageSerializer(many=True, read_only = True)
+    festivals = FestivalSerializer(many=True, read_only = True)
+    reviews = ReviewSerializer(many=True, read_only = True)
     class Meta:
         model = Places
         fields = '__all__'

@@ -71,7 +71,7 @@ def logout_view(request):
 def profile_view(request):
         try :
             user_id=request.user.id
-            userprofile = Profile.objects.get(id=user_id)
+            userprofile = Profile.objects.get(user_id=user_id)
             serializer = UserProfileSerialize(userprofile)
             return Response(serializer.data,status=status.HTTP_200_OK)
         except Profile.DoesNotExist :

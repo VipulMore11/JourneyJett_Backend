@@ -79,3 +79,21 @@ def profile_view(request):
         except Exception as e :
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_profile_view(request):
+        try :
+            user_id=request.user.id
+            data = request.data.copy()
+            data['user']=user_id
+            userprofile_instance = Profile.objects.get(user_id=user_id)
+            serializer = UserProfileSerialize(instance=userprofile_instance, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'message': 'Profile updated successfully'},status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Profile.DoesNotExist :
+            return Response('No Profile Found', status=status.HTTP_404_NOT_FOUND)
+        except Exception as e :
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

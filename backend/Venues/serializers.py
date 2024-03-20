@@ -107,5 +107,6 @@ class DestinationSerializer(serializers.ModelSerializer):
 
 class SavedPlaceSerializer(serializers.ModelSerializer):
     class Meta:
+        depth = 1
         model = SavedPlaces
         fields = ['user', 'place']

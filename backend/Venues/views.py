@@ -131,13 +131,14 @@ def personalize_recommendations(request):
 def saved_places(request):
     try:
         user = request.user
-        place_id = request.data.get('id')
+        place_id = request.GET.get('id')
         there = SavedPlaces.objects.filter(place_id=place_id, user=user).first()
         if there:
             there.delete()
             return Response({'message': 'Place removed from saved places.'}, status=status.HTTP_204_NO_CONTENT)
         else:
             saved_place = SavedPlaces(user=user, place_id=place_id)
+            saved_place.saved = True
             saved_place.save()
             return Response({'message': 'Place saved'}, status=status.HTTP_201_CREATED)
     except Exception as e:

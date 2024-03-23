@@ -1,5 +1,5 @@
 from django.db import models
-from Authentication.models import User
+from Authentication.models import Profile
 
 class Places(models.Model):
     CAT_CHOICES = [
@@ -37,7 +37,7 @@ class PlacesImage(models.Model):
         db_table ='places_images'
 
 class UserVisits(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     place = models.ForeignKey(Places, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -45,8 +45,9 @@ class UserVisits(models.Model):
         db_table ='user_visits'
 
 class SavedPlaces(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
     place = models.ForeignKey(Places, on_delete=models.CASCADE)
+    saved = models.BooleanField(default=False)
 
     class Meta:
         db_table ='saved_places'

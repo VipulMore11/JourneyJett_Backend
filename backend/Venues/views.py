@@ -131,13 +131,15 @@ def personalize_recommendations(request):
 def saved_places(request):
     try:
         user = request.user
-        place_id = request.data.get('id')  # Retrieve place_id from request data
-        serializer = SavedPlaceSerializer(data={'user': user.id, 'place': place_id})
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)    
+        place_id = request.data.get('id')
+        there = SavedPlaces.objects.filter(place_id=place_id, user=user).first()
+        if there:
+            there.delete()
+            return Response({'message': 'Place removed from saved places.'}, status=status.HTTP_204_NO_CONTENT)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            saved_place = SavedPlaces(user=user, place_id=place_id)
+            saved_place.save()
+            return Response({'message': 'Place saved'}, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({'Error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 

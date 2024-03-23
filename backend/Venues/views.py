@@ -153,3 +153,4 @@ def get_saved_places(request):
         return Response(serializers.data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'Error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    

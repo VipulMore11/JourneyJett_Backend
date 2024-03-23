@@ -3,7 +3,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from .serializers import ReviewSerializer
-from .models import Reviews  # Corrected model name
+from .models import Reviews  
+from Venues.models import Places
+from django.db.models import Avg
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -20,6 +22,9 @@ def review_view(request):
         serializer = ReviewSerializer(data=mutable_data)
         if serializer.is_valid():
             serializer.save()
+            place = Places.objects.get(id=place_id)
+            place.rating = Reviews.objects.filter(place=place_id).aggregate(Avg('rating'), default=0)['rating__avg']
+            place.save()
             return Response({'message': 'Review saved successfully'}, status=status.HTTP_201_CREATED) 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

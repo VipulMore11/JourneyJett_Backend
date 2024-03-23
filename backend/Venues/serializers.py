@@ -109,4 +109,4 @@ class SavedPlaceSerializer(serializers.ModelSerializer):
     class Meta:
         depth = 1
         model = SavedPlaces
-        fields = ['user', 'place']
+        fields = ['id','user', 'place']

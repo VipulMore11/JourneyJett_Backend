@@ -15,6 +15,7 @@ class Places(models.Model):
     state =models.CharField(max_length=200,blank=True,null=True)
     location = models.CharField(max_length=200, blank=True, null=True)
     best_time = models.CharField(max_length=200, blank=True, null=True)
+    rating = models.CharField(max_length=200, blank=True, null=True)
     category = models.CharField(choices=CAT_CHOICES, max_length=20,default='',blank=True, null=True)
 
     class Meta:

@@ -103,3 +103,8 @@ class UserProfileSerialize(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = '__all__'
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['username', 'phone_number', 'profile_image']

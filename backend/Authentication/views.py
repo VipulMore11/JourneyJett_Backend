@@ -3,7 +3,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserSerializer,LoginSerializer,UserProfileSerialize
+from .serializers import UserSerializer,LoginSerializer,UserProfileSerialize, UpdateProfileSerializer
 from .models import User,Profile
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -87,7 +87,7 @@ def update_profile_view(request):
             data = request.data.copy()
             data['user']=user_id
             userprofile_instance = Profile.objects.get(user_id=user_id)
-            serializer = UserProfileSerialize(instance=userprofile_instance, data=data)
+            serializer = UpdateProfileSerializer(instance=userprofile_instance, data=data)
             if serializer.is_valid():
                 serializer.save()
                 return Response({'message': 'Profile updated successfully'},status=status.HTTP_200_OK)

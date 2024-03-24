@@ -93,8 +93,8 @@ def get_destination_view(request):
 @permission_classes([IsAuthenticated])
 def personalize_recommendations(request):
     user_id = request.user.id
-
-    user_visits = UserVisits.objects.filter(user_id=user_id).values_list('place_id', flat=True)
+    profile = Profile.objects.get(user=user_id)
+    user_visits = UserVisits.objects.filter(user_id=profile).values_list('place_id', flat=True)
     print(user_visits)
     visited_places = Places.objects.filter(id__in=user_visits)
     # print(visited_places)
@@ -139,7 +139,7 @@ def saved_places(request):
             there.delete()
             return Response({'message': 'Place removed from saved places.'}, status=status.HTTP_204_NO_CONTENT)
         else:
-            saved_place = SavedPlaces(user=user, place_id=place_id)
+            saved_place = SavedPlaces(user=profile, place_id=place_id)
             saved_place.saved = True
             saved_place.save()
             return Response({'message': 'Place saved'}, status=status.HTTP_201_CREATED)
@@ -151,7 +151,8 @@ def saved_places(request):
 def get_saved_places(request):
     try:
         user = request.user.id
-        saved = SavedPlaces.objects.filter(user=user)
+        profile = Profile.objects.get(user=user)
+        saved = SavedPlaces.objects.filter(user=profile)
         serializers = SavedPlaceSerializer(saved, many=True)
         return Response(serializers.data, status=status.HTTP_200_OK)
     except Exception as e:

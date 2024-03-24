@@ -39,7 +39,8 @@ def get_places_view(request):
             if user.is_authenticated:
                 if place_id:
                     venue = Places.objects.get(id=place_id)
-                    UserVisits.objects.create(user=user, place=venue)
+                    profile = Profile.objects.get(user=user)
+                    UserVisits.objects.create(user=profile, place=venue)
 
             if place_id:
                 place = Places.objects.get(id=place_id)

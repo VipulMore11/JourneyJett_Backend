@@ -158,3 +158,12 @@ def get_saved_places(request):
     except Exception as e:
         return Response({'Error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_best_places(request):
+    try:
+        best = Places.objects.all().order_by('rating')
+        serializers = PlaceSerializer(best, many=True)
+        return Response(serializers.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'Error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

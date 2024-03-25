@@ -27,6 +27,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
 
+    'oauth2_provider',
+    'social_django',
+
     'corsheaders',  
     'Authentication',  
     'Reviews', 
@@ -57,6 +60,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -153,6 +158,23 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
     ],
 }
+
+AUTHENTICATION_BACKENDS = (
+    # Google OAuth2
+   'social_core.backends.google.GoogleOAuth2',
+   'drf_social_oauth2.backends.DjangoOAuth2',
+   'django.contrib.auth.backends.ModelBackend',
+)
+
+
+# Define SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE to get extra permissions from Google.
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+]
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '113811177502-d5d4g2ilrc308ke5oj5dcs027jrapucj.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
 # JWT Configuration
 from datetime import timedelta

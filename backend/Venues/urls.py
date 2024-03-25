@@ -12,5 +12,6 @@ urlpatterns = [
     path('recommendations/', views.personalize_recommendations,name='recommendations'),
     path('saved_places/', views.saved_places,name='saved_places'),
     path('get_saved_places/', views.get_saved_places, name='get_saved_places'),
+    path('get_best_places/', views.get_best_places, name='get_best_places'),
     # path('code/', views.execute_code,name='code'),
 ]

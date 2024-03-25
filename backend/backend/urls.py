@@ -23,7 +23,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Authentication.urls')),
     path('', include('Venues.urls')),
-    path('', include('Reviews.urls')),
+    path('', include('Reviews.urls')), 
+    path('api_auth/', include('drf_social_oauth2.urls',namespace='drf')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

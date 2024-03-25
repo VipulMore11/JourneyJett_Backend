@@ -23,8 +23,9 @@ def review_view(request):
         serializer = ReviewSerializer(data=mutable_data)
         if serializer.is_valid():
             serializer.save()
+            rating_avg = Reviews.objects.filter(place=place_id).aggregate(Avg('rating'))['rating__avg']
             place = Places.objects.get(id=place_id)
-            place.rating = Reviews.objects.filter(place=place_id).aggregate(Avg('rating'), default=0)['rating__avg']
+            place.rating = rating_avg if rating_avg is not None else 0
             place.save()
             return Response({'message': 'Review saved successfully'}, status=status.HTTP_201_CREATED) 
         else:
@@ -38,10 +39,10 @@ def review_view(request):
 def get_reviews(request):
     if request.method == 'GET':
         try:
-            user = request.user.id
-            profile = Profile.objects.get(user=user)
             place_id = request.GET.get('place_id')
             if not place_id:
+                user = request.user.id
+                profile = Profile.objects.get(user=user)
                 reviews = Reviews.objects.filter(user=profile)
                 serializer = ReviewSerializer(reviews, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)

@@ -28,8 +28,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
 
     'oauth2_provider',
-    'social_django',
-
+    
     'corsheaders',  
     'Authentication',  
     'Reviews', 

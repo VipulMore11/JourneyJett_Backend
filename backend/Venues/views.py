@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.http import JsonResponse
 from .serializers import *
-from .models import Places, PlacesImage, UserVisits
+from .models import Places, PlacesImage, UserVisits, Events
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from django.db.models import Count, Q
@@ -167,3 +167,77 @@ def get_best_places(request):
         return Response(serializers.data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'Error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def create_event(request):
+    if request.method == 'POST':
+        serializer = EventSerializer(data=request.data)
+        if serializer.is_valid():
+            event = serializer.save()
+            cast_images_data = request.FILES.getlist('cast_image', [])
+            for place_image_data in cast_images_data:
+                CastImage.objects.create(event=event, cast_image=place_image_data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_all_events(request):
+    if request.method == 'GET':
+        event_id = request.GET.get('event_id')
+        if event_id:
+            events = Events.objects.get(id=event_id)
+            serializer = EventSerializer(events)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            events = Events.objects.all()
+            serializer = EventSerializer(events, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'wrong method '}, status=status.HTTP_400_BAD_REQUEST)
+    
+from django.db import transaction
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def done_place(request):
+    try:
+        user = request.user
+        place_id = request.data.get('id')
+        profile = Profile.objects.get(user=user)
+        saved = SavedPlaces.objects.filter(user=profile, place=place_id).first()
+        place = Places.objects.get(id=place_id)
+        if saved:
+            with transaction.atomic():  # Assuming the ID is sent in the request body
+                done_event = DoneEvents.objects.create(user=profile, place=place, done=True)
+                saved_place = SavedPlaces.objects.get(user=profile, place=place)
+                saved_place.delete()
+            return Response({'success': 'Event marked as done'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': 'Not in Saved Places'}, status=status.HTTP_204_NO_CONTENT)
+    except Profile.DoesNotExist:
+        return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+    except SavedPlaces.DoesNotExist:
+        return Response({'error': 'Saved place not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_done_place(request):
+    if request.method == 'GET':
+        user = request.user
+        profile = Profile.objects.get(user=user)
+        place_id = request.GET.get('place_id')
+
+        if place_id:
+            done = DoneEvents.objects.get(place=place_id, user=profile)
+            serializer = GetDoneEventSerializer(done)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            done = DoneEvents.objects.all()
+            serializer = GetDoneEventSerializer(done, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'wrong method '}, status=status.HTTP_400_BAD_REQUEST)

@@ -110,3 +110,38 @@ class SavedPlaceSerializer(serializers.ModelSerializer):
         depth = 1
         model = SavedPlaces
         fields = ['id','user', 'place', 'saved']
+
+class CastImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CastImage
+        fields = ['id', 'cast_image']
+
+class EventSerializer(serializers.ModelSerializer):
+    cast_image = CastImageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Events
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        cast_images = representation.get('cast_image', [])
+
+        # Correctly assign custom IDs starting from 1 for each event's cast images
+        for index, cast_image in enumerate(cast_images, start=1):
+            cast_image['id'] = cast_image['id']
+
+        return representation
+
+class DoneEventSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DoneEvents
+        fields = '__all__'
+
+class GetDoneEventSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        depth = 1
+        model = DoneEvents
+        fields = '__all__'

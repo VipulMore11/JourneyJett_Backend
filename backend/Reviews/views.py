@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
-from .serializers import ReviewSerializer
+from .serializers import ReviewSerializer, GetReviewSerializer
 from .models import Reviews
 from Authentication.models import Profile  
 from Venues.models import Places
@@ -16,10 +16,11 @@ def review_view(request):
         place_id = request.data.get('place_id')
         if not place_id:
             return Response({'error': 'Place ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
+        # places = Places.objects.get(id=place_id)
         mutable_data = request.data.copy()
         mutable_data['place'] = place_id 
         mutable_data['user'] = user.id
+        # print(mutable_data)
         serializer = ReviewSerializer(data=mutable_data)
         if serializer.is_valid():
             serializer.save()
@@ -27,6 +28,7 @@ def review_view(request):
             place = Places.objects.get(id=place_id)
             place.rating = rating_avg if rating_avg is not None else 0
             place.save()
+            # print(serializer.data)
             return Response({'message': 'Review saved successfully'}, status=status.HTTP_201_CREATED) 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -44,11 +46,11 @@ def get_reviews(request):
                 user = request.user.id
                 profile = Profile.objects.get(user=user)
                 reviews = Reviews.objects.filter(user=profile)
-                serializer = ReviewSerializer(reviews, many=True)
+                serializer = GetReviewSerializer(reviews, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 reviews = Reviews.objects.filter(place=place_id)
-                serializer = ReviewSerializer(reviews, many=True)
+                serializer = GetReviewSerializer(reviews, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
         except Reviews.DoesNotExist:
             return Response({'message': 'Reviews not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -114,4 +116,3 @@ def get_reviews(request):
 #     }
 
 #     return data
-
